@@ -17,7 +17,9 @@
 package com.example.android.android_me.ui;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,11 +28,14 @@ import android.widget.ImageView;
 
 import com.example.android.android_me.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class BodyPartFragment extends Fragment {
 
     // TODO (3) Create final Strings to store state information about the list of images and list index
+    final private static String LIST_OF_IMGAES = "LIST_OF_IMAGES";
+    final private static String IMAGE_INDEX = "IMAGE_INDEX";
 
     // Tag for logging
     private static final String TAG = "BodyPartFragment";
@@ -51,11 +56,15 @@ public class BodyPartFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
+        if(savedInstanceState != null){
+            mImageIds = savedInstanceState.getIntegerArrayList(LIST_OF_IMGAES);
+            mListIndex = savedInstanceState.getInt(IMAGE_INDEX);
+        }
         // Inflate the Android-Me fragment layout
         View rootView = inflater.inflate(R.layout.fragment_body_part, container, false);
 
         // Get a reference to the ImageView in the fragment layout
-        ImageView imageView = (ImageView) rootView.findViewById(R.id.body_part_image_view);
+        final ImageView imageView = (ImageView) rootView.findViewById(R.id.body_part_image_view);
 
         // If a list of image ids exists, set the image resource to the correct item in that list
         // Otherwise, create a Log statement that indicates that the list was not found
@@ -65,6 +74,19 @@ public class BodyPartFragment extends Fragment {
 
             // TODO (1) Set a click listener on the image view and on a click increment the list index and set the image resource
             // TODO (2) If you reach the end of a list of images, set the list index back to 0 (the first item in the list)
+
+            imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(mListIndex < mImageIds.size() - 1){
+                        mListIndex++;
+                    }else{
+                        mListIndex = 0;
+                    }
+
+                    imageView.setImageResource(mImageIds.get(mListIndex));
+                }
+            });
 
         } else {
             Log.v(TAG, "This fragment has a null list of image id's");
@@ -86,4 +108,10 @@ public class BodyPartFragment extends Fragment {
     }
 
     // TODO (4) Override onSaveInstanceState and save the current state of this fragment
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putIntegerArrayList(LIST_OF_IMGAES, (ArrayList<Integer>) mImageIds);
+        outState.putInt(IMAGE_INDEX, mListIndex);
+    }
 }
